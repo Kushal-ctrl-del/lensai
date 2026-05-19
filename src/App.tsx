@@ -7,7 +7,6 @@ import {
   DollarSign, 
   ShoppingBag, 
   Download, 
-  MessageSquare, 
   Send,
   Mail,
   CheckCircle,
@@ -15,7 +14,7 @@ import {
 } from 'lucide-react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Legend
+  BarChart, Bar, Cell
 } from 'recharts';
 import Papa from 'papaparse';
 import Anthropic from '@anthropic-ai/sdk';
@@ -244,7 +243,7 @@ export default function App() {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const } }
   };
 
   return (
@@ -454,8 +453,8 @@ export default function App() {
                           />
                           <Bar dataKey="sales" fill="#06B6D4" radius={[0, 4, 4, 0]} barSize={20}>
                             {
-                              barData.map((entry, index) => (
-                                <cell key={`cell-${index}`} fill={index % 2 === 0 ? '#06B6D4' : '#7C3AED'} />
+                              barData.map((_entry, index) => (
+                                <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#06B6D4' : '#7C3AED'} />
                               ))
                             }
                           </Bar>
