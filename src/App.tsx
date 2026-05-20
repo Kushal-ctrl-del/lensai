@@ -18,6 +18,7 @@ import {
   BarChart, Bar, Cell
 } from 'recharts';
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 import Anthropic from '@anthropic-ai/sdk';
 
 const GitHub = ({ className }: { className?: string }) => (
@@ -144,22 +145,42 @@ export default function App() {
     }
   };
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     setFileName(file.name);
     setIsLoading(true);
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
+
+    const fileExt = file.name.split('.').pop()?.toLowerCase();
+
+    if (fileExt === 'xlsx' || fileExt === 'xls') {
+      try {
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        
         setTimeout(() => {
-          processData(results.data);
+          processData(jsonData);
         }, 800);
-      },
-      error: (error) => {
-        console.error("Parse Error:", error);
+      } catch (error) {
+        console.error("Excel Parse Error:", error);
         setIsLoading(false);
       }
-    });
+    } else {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          setTimeout(() => {
+            processData(results.data);
+          }, 800);
+        },
+        error: (error) => {
+          console.error("Parse Error:", error);
+          setIsLoading(false);
+        }
+      });
+    }
   };
 
   const formatCurrency = (value: number) => {
