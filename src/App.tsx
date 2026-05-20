@@ -239,7 +239,18 @@ export default function App() {
       );
 
       const data = await response.json();
-      const text = data.candidates[0].content.parts[0].text;
+      
+      console.log('Gemini raw response:', JSON.stringify(data));
+
+      let text = '';
+      if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        text = data.candidates[0].content.parts[0].text;
+      } else if (data?.error) {
+        text = `API Error: ${data.error.message}`;
+      } else {
+        text = `Unexpected response: ${JSON.stringify(data)}`;
+      }
+
       setMessages(prev => [...prev, { role: 'assistant', content: text }]);
     } catch (error: any) {
       console.error('Full error:', JSON.stringify(error));
