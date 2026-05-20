@@ -215,7 +215,7 @@ export default function App() {
       console.log('CSV Summary:', csvSummary);
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -241,9 +241,10 @@ export default function App() {
       const data = await response.json();
       const text = data.candidates[0].content.parts[0].text;
       setMessages(prev => [...prev, { role: 'assistant', content: text }]);
-    } catch (error) {
-      console.error(error);
-      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, there was an error. Check your API key or try again." }]);
+    } catch (error: any) {
+      console.error('Full error:', JSON.stringify(error));
+      const errMsg = error?.message || JSON.stringify(error);
+      setMessages(prev => [...prev, { role: 'assistant', content: `Error: ${errMsg}` }]);
     } finally {
       setIsTyping(false);
     }
