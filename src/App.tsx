@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import {
   UploadCloud,
   BarChart3,
@@ -41,7 +42,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
 
-  const [messages, setMessages] = useState<{role: 'user' | 'assistant', content: string}[]>([]);
+  const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [apiKey, setApiKey] = useState('');
@@ -173,7 +174,7 @@ export default function App() {
   const sendChatMessage = async (msg: string) => {
     if (!msg.trim()) return;
 
-    const newMessages: {role: 'user' | 'assistant', content: string}[] = [
+    const newMessages: { role: 'user' | 'assistant', content: string }[] = [
       ...messages,
       { role: 'user', content: msg }
     ];
@@ -267,11 +268,10 @@ export default function App() {
                 className="h-[60vh] flex flex-col items-center justify-center"
               >
                 <div
-                  className={`w-full max-w-2xl aspect-video rounded-3xl border-2 border-dashed flex flex-col items-center justify-center p-8 transition-all duration-300 relative overflow-hidden group ${
-                    isDragging
+                  className={`w-full max-w-2xl aspect-video rounded-3xl border-2 border-dashed flex flex-col items-center justify-center p-8 transition-all duration-300 relative overflow-hidden group ${isDragging
                       ? 'border-violet-500 bg-violet-500/10 shadow-[0_0_30px_rgba(124,58,237,0.2)]'
                       : 'border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] hover:border-violet-500/50 hover:bg-[rgba(255,255,255,0.04)]'
-                  }`}
+                    }`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
@@ -379,13 +379,13 @@ export default function App() {
                         <AreaChart data={areaData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                           <defs>
                             <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.8}/>
-                              <stop offset="95%" stopColor="#7C3AED" stopOpacity={0}/>
+                              <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.8} />
+                              <stop offset="95%" stopColor="#7C3AED" stopOpacity={0} />
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                           <XAxis dataKey="name" stroke="rgba(255,255,255,0.3)" fontSize={12} tickLine={false} axisLine={false} />
-                          <YAxis stroke="rgba(255,255,255,0.3)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val/1000}k`} />
+                          <YAxis stroke="rgba(255,255,255,0.3)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val / 1000}k`} />
                           <Tooltip contentStyle={{ backgroundColor: 'rgba(13, 13, 26, 0.9)', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }} itemStyle={{ color: '#06B6D4' }} />
                           <Area type="monotone" dataKey="revenue" stroke="#7C3AED" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" />
                         </AreaChart>
@@ -469,11 +469,10 @@ export default function App() {
                   key={i}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
-                    msg.role === 'user'
+                  className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${msg.role === 'user'
                       ? 'bg-violet-600 text-white self-end rounded-br-sm'
                       : 'bg-[rgba(255,255,255,0.05)] text-gray-200 border border-[rgba(255,255,255,0.05)] self-start rounded-bl-sm'
-                  }`}
+                    }`}
                 >
                   <div className="text-sm" dangerouslySetInnerHTML={{ __html: msg.content.replace(/\n/g, '<br/>') }} />
                 </motion.div>
@@ -552,7 +551,8 @@ export default function App() {
         </div>
       </footer>
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes shimmer {
           100% { transform: translateX(100%); }
         }
