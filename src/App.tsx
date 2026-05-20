@@ -19,7 +19,6 @@ import {
 } from 'recharts';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-import Anthropic from '@anthropic-ai/sdk';
 
 const GitHub = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -205,24 +204,36 @@ export default function App() {
 
     if (!apiKey) {
       setTimeout(() => {
-        setMessages(prev => [...prev, { role: 'assistant', content: `You haven't provided an Anthropic API key yet. Based on the summary: ${csvSummary}, I can see your data. Please provide an API key to get real insights!` }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: "Please provide a Gemini API key to get real insights. Get one free at aistudio.google.com" }]);
         setIsTyping(false);
       }, 1500);
       return;
     }
 
     try {
-      const anthropic = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-      const systemPrompt = `You are a business intelligence analyst. The user has uploaded sales data: ${csvSummary}. Answer questions about this data clearly and give actionable insights. Keep answers concise.`;
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: `You are a business intelligence analyst. 
+        The user uploaded sales data: ${csvSummary}. 
+        Answer questions clearly and give actionable insights. 
+        Keep answers concise.` }]
+            },
+            contents: newMessages.map(m => ({
+              role: m.role === 'assistant' ? 'model' : 'user',
+              parts: [{ text: m.content }]
+            }))
+          })
+        }
+      );
 
-      const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
-        system: systemPrompt,
-        messages: newMessages.map(m => ({ role: m.role, content: m.content }))
-      });
-
-      setMessages(prev => [...prev, { role: 'assistant', content: (response.content[0] as any).text }]);
+      const data = await response.json();
+      const text = data.candidates[0].content.parts[0].text;
+      setMessages(prev => [...prev, { role: 'assistant', content: text }]);
     } catch (error) {
       console.error(error);
       setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, there was an error. Check your API key or try again." }]);
@@ -343,12 +354,12 @@ export default function App() {
                 </div>
 
                 <div className="mt-8 flex items-center gap-3 bg-[rgba(255,255,255,0.03)] p-3 rounded-xl border border-[rgba(255,255,255,0.05)] w-full max-w-xl">
-                  <span className="text-sm text-gray-400 whitespace-nowrap pl-2">Anthropic API Key:</span>
+                  <span className="text-sm text-gray-400 whitespace-nowrap pl-2">Gemini API Key:</span>
                   <input
                     type="password"
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="sk-ant-..."
+                    placeholder="AIza..."
                     className="flex-1 bg-transparent border-none outline-none text-sm text-white focus:ring-0 placeholder:text-gray-600 font-mono"
                   />
                 </div>
